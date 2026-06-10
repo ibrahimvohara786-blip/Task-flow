@@ -14,13 +14,9 @@
       <p>Smart work, clear progress</p>
     </div>
     <nav class="menu">
-    <button class="nav-link active" data-section="tasks"><i class="fa-solid fa-list-check"></i> Tasks</button>
-    <button class="nav-link" data-section="statistics"><i class="fa-solid fa-chart-column"></i> Statistics</button>
-    <button class="nav-link" data-section="analytics"><i class="fa-solid fa-chart-pie"></i> Analytics</button>
-    <button class="nav-link" data-section="calendar"><i class="fa-solid fa-calendar-days"></i> Calendar</button>
-    <button class="nav-link" data-section="achievements"><i class="fa-solid fa-trophy"></i> Achievements</button>
-    <button class="nav-link" data-section="goals"><i class="fa-solid fa-bullseye"></i> Goals</button>
-    <button class="nav-link" data-section="settings"><i class="fa-solid fa-gear"></i> Settings</button>
+      <button class="nav-link active" data-section="tasks"><i class="fa-solid fa-list-check"></i> Tasks</button>
+      <button class="nav-link" data-section="statistics"><i class="fa-solid fa-chart-column"></i> Statistics</button>
+      <button class="nav-link" data-section="settings"><i class="fa-solid fa-gear"></i> Settings</button>
     </nav>
   </div>
   <div class="main">
@@ -32,6 +28,7 @@
       </div>
       <div class="top-actions">
         <button id="themeBtn" class="icon-btn" aria-label="Toggle theme"><i class="fa-solid fa-moon"></i></button>
+        <button id="deepWorkBtn" class="icon-btn" title="Deep Work mode" aria-label="Deep Work"><i class="fa-solid fa-person-rays"></i></button>
         <button id="logoutBtn" class="secondary-btn">Logout</button>
       </div>
     </header>
@@ -95,65 +92,53 @@
         <div class="detail-card"><h3>Overview</h3><p>Keep momentum by balancing high and low priority work.</p></div>
         <div class="detail-card"><h3>Time management</h3><p>Use due dates and filters to stay ahead of deadlines.</p></div>
       </div>
-    </section>
-    <section class="section hidden" id="analyticsSection">
-      <div class="section-header">
-        <div>
-          <h2>Analytics</h2>
-          <p>Visual breakdown of productivity and task trends.</p>
-        </div>
+      <div class="stats-subnav">
+        <button class="subnav-btn active" data-sub="overview">Overview</button>
+        <button class="subnav-btn" data-sub="analytics">Analytics</button>
+        <button class="subnav-btn" data-sub="achievements">Achievements</button>
+        <button class="subnav-btn" data-sub="goals">Daily Goals</button>
       </div>
-      <div class="cards cards-grid">
-        <article class="stat-card"><span>Productivity Score</span><h3 id="productivityScore">0</h3><p>Your overall productivity rating.</p></article>
-        <article class="stat-card"><span>Weekly Completed</span><h3 id="weeklyCompleted">0</h3><p>Tasks completed this week.</p></article>
-        <article class="stat-card"><span>Current Streak</span><h3 id="currentStreak">0 days</h3><p>Consecutive days meeting goals.</p></article>
-      </div>
-      <div class="detail-card" id="analyticsChart"><h3>Trends</h3><p>Activity by day (placeholder).</p></div>
-    </section>
 
-    <section class="section hidden" id="calendarSection">
-      <div class="section-header">
-        <div>
-          <h2>Calendar</h2>
-          <p>See tasks by date and navigate the month.</p>
+      <section class="section" id="analyticsSection" style="display:none">
+        <div class="section-header">
+          <div>
+            <h2>Analytics</h2>
+            <p>Overview of your productivity and trends.</p>
+          </div>
         </div>
-        <div>
-          <button id="prevMonth" class="secondary-btn">Prev</button>
-          <button id="nextMonth" class="secondary-btn">Next</button>
+        <div class="cards cards-grid">
+          <article class="stat-card"><span>Productivity Score</span><h3 id="productivityScore">0%</h3><p>Combined score from completion rate and streak.</p></article>
+          <article class="stat-card"><span>Weekly Completed</span><h3 id="weeklyCompleted">0</h3><p>Tasks completed in the last 7 days.</p></article>
+          <article class="stat-card"><span>Current Streak</span><h3 id="currentStreak">0 days</h3><p>Consecutive days with completed tasks.</p></article>
         </div>
-      </div>
-      <div class="calendar-header">
-        <div id="monthYear" class="month-year"></div>
-        <div id="calendarWeekdays" class="calendar-weekdays"></div>
-      </div>
-      <div id="calendar" class="calendar"></div>
-      <div id="calendarTasks" class="cards"></div>
-    </section>
+        <div class="detail-card"><h3>Activity</h3><div id="analyticsChart" class="analytics-chart" aria-hidden="false"></div></div>
+      </section>
 
-    <section class="section hidden" id="achievementsSection">
-      <div class="section-header">
-        <div>
-          <h2>Achievements</h2>
-          <p>Earn badges for milestones and streaks.</p>
+      <section class="section" id="achievementsSection" style="display:none">
+        <div class="section-header">
+          <div>
+            <h2>Achievements</h2>
+            <p>Earn badges for milestones and streaks.</p>
+          </div>
         </div>
-      </div>
-      <div id="achievementsList" class="cards"></div>
-    </section>
+        <div id="achievementsList" class="cards"></div>
+      </section>
 
-    <section class="section hidden" id="goalsSection">
-      <div class="section-header">
-        <div>
-          <h2>Daily Goals</h2>
-          <p>Create and track small daily objectives.</p>
+      <section class="section" id="goalsSection" style="display:none">
+        <div class="section-header">
+          <div>
+            <h2>Daily Goals</h2>
+            <p>Create and track small daily objectives.</p>
+          </div>
         </div>
-        <div class="summary-badge">Focus</div>
-      </div>
-      <form id="goalForm" class="task-form">
-        <input type="text" id="goalInput" placeholder="Add a daily goal" required>
-        <button type="submit" class="primary-btn">Add Goal</button>
-      </form>
-      <ul id="goalList" class="task-list"></ul>
+        <form id="goalForm" class="task-form">
+          <input type="text" id="goalInput" placeholder="Add a daily goal" required>
+          <button type="submit" class="primary-btn">Add Goal</button>
+        </form>
+        <ul id="goalList" class="task-list"></ul>
+      </section>
     </section>
+    
     <section class="section hidden" id="settingsSection">
       <div class="section-header">
         <div>
@@ -169,6 +154,17 @@
     </section>
   </div>
   <div id="toast" class="toast"></div>
+  <div id="deepWorkOverlay" class="deep-work-overlay">
+    <div class="deep-work-panel">
+      <div class="dw-timer" id="dwTimer">25:00</div>
+      <div class="dw-controls">
+        <button id="dwStart" class="primary-btn">Start</button>
+        <button id="dwPause" class="secondary-btn">Pause</button>
+        <button id="dwReset" class="secondary-btn">Reset</button>
+      </div>
+      <div style="margin-top:12px"><button id="dwClose" class="secondary-btn">Exit Deep Work</button></div>
+    </div>
+  </div>
   <script src="js/dasbord.js"></script>
 </body>
 </html>

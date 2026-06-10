@@ -1,4 +1,5 @@
-﻿const userData = JSON.parse(localStorage.getItem('taskflow-user'));
+﻿
+const userData = JSON.parse(localStorage.getItem('taskflow-user'));
 if (!userData) {
     window.location.href = 'index.html';
 }
@@ -71,8 +72,189 @@ const showToast = (message) => {
 
 const saveTasks = () => {
     localStorage.setItem('taskflow-tasks', JSON.stringify(tasks));
-    try { if (typeof refreshAll === 'function') refreshAll(); } catch(e){}
+    try { if (typeof updateAnalytics === 'function') updateAnalytics(); } catch(e){}
+    try { if (typeof renderAchievements === 'function') renderAchievements(); } catch(e){}
+    try { if (typeof renderGoals === 'function') renderGoals(); } catch(e){}
 };
+
+/* --- New features: Deep Work, Analytics, Achievements, Daily Goals --- */
+const deepWorkBtn = document.getElementById('deepWorkBtn');
+const deepWorkOverlay = document.getElementById('deepWorkOverlay');
+const dwTimerEl = document.getElementById('dwTimer');
+const dwStart = document.getElementById('dwStart');
+const dwPause = document.getElementById('dwPause');
+const dwReset = document.getElementById('dwReset');
+const dwClose = document.getElementById('dwClose');
+
+// Ensure completedAt on tasks when toggled
+const markCompletedAt = (task, isCompleted) => {
+    if (isCompleted) task.completedAt = new Date().toISOString(); else delete task.completedAt;
+};
+
+// Analytics & Productivity
+const productivityScoreEl = document.getElementById('productivityScore');
+const weeklyCompletedEl = document.getElementById('weeklyCompleted');
+const currentStreakEl = document.getElementById('currentStreak');
+
+const computeWeeklyCompleted = () => {
+    const today = new Date();
+    const weekStart = new Date(today);
+    weekStart.setDate(today.getDate() - 6);
+    const weekStartStr = weekStart.toISOString().slice(0, 10);
+    return tasks.filter(t => t.completedAt && t.completedAt.slice(0,10) >= weekStartStr).length;
+};
+
+const computeStreak = () => {
+    const completedDates = new Set(tasks.filter(t => t.completedAt).map(t => t.completedAt.slice(0,10)));
+    let streak = 0; let d = new Date();
+    while (true) {
+        const key = d.toISOString().slice(0,10);
+        if (completedDates.has(key)) { streak++; d.setDate(d.getDate()-1); } else break;
+    }
+    return streak;
+};
+
+const computeProductivityScore = () => {
+    const total = tasks.length;
+    const completed = tasks.filter(t => t.completed).length;
+    const completionRate = total === 0 ? 0 : (completed / total) * 100;
+    const streak = computeStreak();
+    const streakBonus = Math.min(streak, 7) / 7 * 100;
+    return Math.round((completionRate * 0.7) + (streakBonus * 0.3));
+};
+
+const updateAnalytics = () => {
+    if (productivityScoreEl) productivityScoreEl.textContent = `${computeProductivityScore()}%`;
+    if (weeklyCompletedEl) weeklyCompletedEl.textContent = computeWeeklyCompleted();
+    if (currentStreakEl) currentStreakEl.textContent = `${computeStreak()} day${computeStreak()===1? '':'s'}`;
+    try{ renderAnalyticsChart(); }catch(e){}
+};
+
+// Achievements
+const achievementsListEl = document.getElementById('achievementsList');
+const achievements = [
+    { id: 'first-task', title: 'First Task', desc: 'Add your first task', earned: false },
+    { id: 'five-complete', title: '5 Completed', desc: 'Complete 5 tasks', earned: false },
+    { id: 'ten-complete', title: '10 Completed', desc: 'Complete 10 tasks', earned: false },
+    { id: 'week-streak', title: '7-Day Streak', desc: 'Complete tasks 7 days in a row', earned: false }
+];
+
+const renderAchievements = () => {
+    if (!achievementsListEl) return;
+    const totalCompleted = tasks.filter(t => t.completed).length;
+    achievements.forEach(a => {
+        if (a.id === 'first-task') a.earned = tasks.length >= 1;
+        if (a.id === 'five-complete') a.earned = totalCompleted >= 5;
+        if (a.id === 'ten-complete') a.earned = totalCompleted >= 10;
+        if (a.id === 'week-streak') a.earned = computeStreak() >= 7;
+    });
+    achievementsListEl.innerHTML = '';
+    achievements.forEach(a => {
+        const el = document.createElement('div'); el.className = 'achievement';
+        el.innerHTML = `<div class="badge">${a.earned? '🏆':'🔒'}</div><div><strong>${a.title}</strong><p class="task-desc">${a.desc}</p></div>`;
+        achievementsListEl.appendChild(el);
+    });
+};
+
+// Daily Goals
+const goalForm = document.getElementById('goalForm');
+const goalInput = document.getElementById('goalInput');
+const goalList = document.getElementById('goalList');
+let goals = JSON.parse(localStorage.getItem('taskflow-goals') || '[]');
+
+const saveGoals = () => { localStorage.setItem('taskflow-goals', JSON.stringify(goals)); };
+
+const renderGoals = () => {
+    if (!goalList) return;
+    goalList.innerHTML = '';
+    const today = new Date().toISOString().slice(0,10);
+    const todaysGoals = goals.filter(g => g.date === today);
+    if (todaysGoals.length === 0) { goalList.innerHTML = '<div class="empty-state">No goals set for today.</div>'; return; }
+    todaysGoals.forEach((g, idx) => {
+        const li = document.createElement('li'); li.className = 'goal-item';
+        li.innerHTML = `<div>${g.title}</div><div><button class="secondary-btn" data-idx="${idx}">${g.completed? 'Undo' : 'Done'}</button></div>`;
+        goalList.appendChild(li);
+    });
+};
+
+// Analytics chart rendering (7-day simple bars)
+const analyticsChartEl = document.getElementById('analyticsChart');
+const getLast7Days = () => {
+    const now = new Date();
+    const days = [];
+    for (let i = 6; i >= 0; i--) {
+        const d = new Date(now); d.setDate(now.getDate() - i);
+        days.push(d.toISOString().slice(0,10));
+    }
+    return days;
+};
+
+const renderAnalyticsChart = () => {
+    if (!analyticsChartEl) return;
+    const days = getLast7Days();
+    const counts = days.map(day => tasks.filter(t=>t.completedAt && t.completedAt.slice(0,10)===day).length);
+    analyticsChartEl.innerHTML = '';
+    const max = Math.max(...counts, 1);
+    days.forEach((d,i)=>{
+        const bar = document.createElement('div'); bar.className = 'bar';
+        const h = Math.round((counts[i]/max)*100);
+        bar.style.height = `${Math.max(6,h)}%`;
+        bar.innerHTML = `<small>${counts[i]}</small><div style="font-size:.7rem;color:var(--muted);margin-top:6px">${d.slice(5)}</div>`;
+        analyticsChartEl.appendChild(bar);
+    });
+};
+
+// Stats sub-navigation handling
+const subnavBtns = document.querySelectorAll('.subnav-btn');
+const overviewElements = document.querySelectorAll('.details-grid');
+const analyticsSection = document.getElementById('analyticsSection');
+const achievementsSection = document.getElementById('achievementsSection');
+const goalsSection = document.getElementById('goalsSection');
+
+subnavBtns.forEach(btn=>{
+    btn.addEventListener('click', ()=>{
+        subnavBtns.forEach(b=>b.classList.toggle('active', b===btn));
+        const key = btn.dataset.sub;
+        // toggle visibility
+        overviewElements.forEach(e=> e.style.display = key==='overview' ? '' : 'none');
+        if (analyticsSection) analyticsSection.style.display = key==='analytics' ? '' : 'none';
+        if (achievementsSection) achievementsSection.style.display = key==='achievements' ? '' : 'none';
+        if (goalsSection) goalsSection.style.display = key==='goals' ? '' : 'none';
+    });
+});
+
+goalForm && goalForm.addEventListener('submit', (e) => {
+    e.preventDefault();
+    const title = goalInput.value.trim(); if (!title) return;
+    const today = new Date().toISOString().slice(0,10);
+    goals.push({ title, completed: false, date: today });
+    saveGoals(); renderGoals(); goalInput.value = '';
+});
+
+goalList && goalList.addEventListener('click', (e) => {
+    const btn = e.target.closest('button'); if (!btn) return;
+    const idx = Number(btn.dataset.idx);
+    const today = new Date().toISOString().slice(0,10);
+    const todays = goals.filter(g => g.date === today);
+    const goal = todays[idx]; if (!goal) return;
+    goal.completed = !goal.completed; saveGoals(); renderGoals();
+});
+
+// Deep Work mode: simple timer and overlay
+let dwInterval = null; let dwSeconds = 25*60; let dwRunning = false;
+const formatTime = s => { const m = Math.floor(s/60); const sec = s%60; return `${String(m).padStart(2,'0')}:${String(sec).padStart(2,'0')}`; };
+const openDeepWork = () => { if (deepWorkOverlay) deepWorkOverlay.style.display='flex'; if (dwTimerEl) dwTimerEl.textContent = formatTime(dwSeconds); };
+const closeDeepWork = () => { if (deepWorkOverlay) deepWorkOverlay.style.display='none'; clearInterval(dwInterval); dwInterval=null; dwRunning=false; };
+const startDW = () => { if (dwRunning) return; dwRunning=true; dwInterval = setInterval(()=>{ if (dwSeconds<=0){ clearInterval(dwInterval); dwRunning=false; showToast('Deep work session finished'); return; } dwSeconds--; if (dwTimerEl) dwTimerEl.textContent = formatTime(dwSeconds); },1000); };
+const pauseDW = () => { if (dwInterval) { clearInterval(dwInterval); dwInterval=null; dwRunning=false; } };
+const resetDW = () => { pauseDW(); dwSeconds = 25*60; if (dwTimerEl) dwTimerEl.textContent = formatTime(dwSeconds); };
+
+deepWorkBtn && deepWorkBtn.addEventListener('click', ()=>{ openDeepWork(); });
+dwStart && dwStart.addEventListener('click', startDW);
+dwPause && dwPause.addEventListener('click', pauseDW);
+dwReset && dwReset.addEventListener('click', resetDW);
+dwClose && dwClose.addEventListener('click', ()=>{ closeDeepWork(); });
+
 
 
 const getHighPriorityCount = () => tasks.filter((task) => task.priority === 'High').length;
@@ -207,6 +389,7 @@ taskList.addEventListener('click', (event) => {
     }
     if (action === 'toggle') {
         tasks[index].completed = !tasks[index].completed;
+        markCompletedAt(tasks[index], tasks[index].completed);
         renderTasks();
         showToast(tasks[index].completed ? 'Task completed.' : 'Task marked pending.');
     }
@@ -265,183 +448,6 @@ welcomeUser.textContent = `Welcome back, ${userData.name}`;
 accountInfo.textContent = `${userData.name} • ${userData.email}`;
 
 renderTasks();
-
-/* --- New features: Analytics, Achievements, Calendar, Goals, Productivity --- */
-// Extend sections mapping
-sections.analytics = document.getElementById('analyticsSection');
-sections.calendar = document.getElementById('calendarSection');
-sections.achievements = document.getElementById('achievementsSection');
-sections.goals = document.getElementById('goalsSection');
-
-const productivityScoreEl = document.getElementById('productivityScore');
-const weeklyCompletedEl = document.getElementById('weeklyCompleted');
-const currentStreakEl = document.getElementById('currentStreak');
-
-const calendarEl = document.getElementById('calendar');
-const calendarTasksEl = document.getElementById('calendarTasks');
-const prevMonthBtn = document.getElementById('prevMonth');
-const nextMonthBtn = document.getElementById('nextMonth');
-const monthYearEl = document.getElementById('monthYear');
-const calendarWeekdaysEl = document.getElementById('calendarWeekdays');
-
-const achievementsListEl = document.getElementById('achievementsList');
-
-const goalForm = document.getElementById('goalForm');
-const goalInput = document.getElementById('goalInput');
-const goalList = document.getElementById('goalList');
-
-let goals = JSON.parse(localStorage.getItem('taskflow-goals') || '[]');
-
-// Simple achievements definitions
-const achievements = [
-    { id: 'first-task', title: 'First Task', desc: 'Add your first task', earned: false },
-    { id: 'five-complete', title: '5 Completed', desc: 'Complete 5 tasks', earned: false },
-    { id: 'ten-complete', title: '10 Completed', desc: 'Complete 10 tasks', earned: false },
-    { id: 'week-streak', title: '7-Day Streak', desc: 'Meet your daily goal for 7 days', earned: false }
-];
-
-const computeWeeklyCompleted = () => {
-    const today = new Date();
-    const weekStart = new Date(today);
-    weekStart.setDate(today.getDate() - 6);
-    const weekStartStr = weekStart.toISOString().slice(0, 10);
-    const completed = tasks.filter(t => t.completed && t.createdAt && t.createdAt.slice(0,10) >= weekStartStr).length;
-    return completed;
-};
-
-const computeStreak = () => {
-    // Count consecutive days (including today) with at least one completed task
-    const completedDates = new Set(tasks.filter(t => t.completed && t.createdAt).map(t => t.createdAt.slice(0,10)));
-    let streak = 0;
-    let d = new Date();
-    while (true) {
-        const key = d.toISOString().slice(0,10);
-        if (completedDates.has(key)) { streak++; d.setDate(d.getDate() - 1); } else break;
-    }
-    return streak;
-};
-
-const computeProductivityScore = () => {
-    const total = tasks.length;
-    const completed = tasks.filter(t => t.completed).length;
-    const completionRate = total === 0 ? 0 : (completed / total) * 100;
-    const streak = computeStreak();
-    const streakBonus = Math.min(streak, 7) / 7 * 100; // up to 100
-    // Weighted: 70% completion, 30% streak
-    return Math.round((completionRate * 0.7) + (streakBonus * 0.3));
-};
-
-const updateAnalytics = () => {
-    const score = computeProductivityScore();
-    productivityScoreEl.textContent = `${score}`;
-    weeklyCompletedEl.textContent = computeWeeklyCompleted();
-    currentStreakEl.textContent = `${computeStreak()} days`;
-};
-
-const renderAchievements = () => {
-    // update earned flags
-    const totalCompleted = tasks.filter(t => t.completed).length;
-    achievements.forEach(a => {
-        if (a.id === 'first-task') a.earned = tasks.length >= 1;
-        if (a.id === 'five-complete') a.earned = totalCompleted >= 5;
-        if (a.id === 'ten-complete') a.earned = totalCompleted >= 10;
-        if (a.id === 'week-streak') a.earned = computeStreak() >= 7;
-    });
-    achievementsListEl.innerHTML = '';
-    achievements.forEach(a => {
-        const el = document.createElement('div');
-        el.className = 'achievement';
-        el.innerHTML = `<div class="badge">${a.earned ? '🏆' : '🔒'}</div><div><strong>${a.title}</strong><p class="task-desc">${a.desc}</p></div>`;
-        achievementsListEl.appendChild(el);
-    });
-};
-
-// Calendar rendering (simple month grid)
-let calendarDate = new Date();
-const renderCalendar = () => {
-    calendarEl.innerHTML = '';
-    const year = calendarDate.getFullYear();
-    const month = calendarDate.getMonth();
-    const monthNames = ['January','February','March','April','May','June','July','August','September','October','November','December'];
-    if (monthYearEl) monthYearEl.textContent = `${monthNames[month]} ${year}`;
-    // render weekday headers
-    if (calendarWeekdaysEl) {
-        const days = ['Sun','Mon','Tue','Wed','Thu','Fri','Sat'];
-        calendarWeekdaysEl.innerHTML = '';
-        days.forEach(d => { const el = document.createElement('div'); el.className = 'weekday'; el.textContent = d; calendarWeekdaysEl.appendChild(el); });
-    }
-    const first = new Date(year, month, 1);
-    const startDay = first.getDay();
-    const daysInMonth = new Date(year, month+1, 0).getDate();
-    // pad empty days
-    for (let i = 0; i < startDay; i++) {
-        const empty = document.createElement('div'); empty.className = 'day'; calendarEl.appendChild(empty);
-    }
-    for (let d = 1; d <= daysInMonth; d++) {
-        const dayEl = document.createElement('div'); dayEl.className = 'day';
-        const dateStr = new Date(year, month, d).toISOString().slice(0,10);
-        const dateLabel = document.createElement('div'); dateLabel.className = 'date'; dateLabel.textContent = d;
-        dayEl.appendChild(dateLabel);
-        const cnt = tasks.filter(t => t.dueDate === dateStr).length;
-        if (cnt > 0) { const badge = document.createElement('small'); badge.textContent = `${cnt} task${cnt>1?'s':''}`; dayEl.appendChild(badge); dayEl.classList.add('has-tasks'); }
-        dayEl.addEventListener('click', () => renderCalendarTasks(dateStr));
-        calendarEl.appendChild(dayEl);
-    }
-};
-
-const renderCalendarTasks = (dateStr) => {
-    calendarTasksEl.innerHTML = '';
-    const list = tasks.filter(t => t.dueDate === dateStr);
-    if (list.length === 0) { calendarTasksEl.innerHTML = '<div class="card">No tasks on this date.</div>'; return; }
-    list.forEach(t => {
-        const card = document.createElement('div'); card.className = 'card';
-        card.innerHTML = `<strong>${t.title}</strong><p class="task-desc">${t.description || ''}</p><small>${t.priority}</small>`;
-        calendarTasksEl.appendChild(card);
-    });
-};
-
-prevMonthBtn && prevMonthBtn.addEventListener('click', () => { calendarDate.setMonth(calendarDate.getMonth()-1); renderCalendar(); });
-nextMonthBtn && nextMonthBtn.addEventListener('click', () => { calendarDate.setMonth(calendarDate.getMonth()+1); renderCalendar(); });
-
-// Goals
-const saveGoals = () => localStorage.setItem('taskflow-goals', JSON.stringify(goals));
-
-const renderGoals = () => {
-    goalList.innerHTML = '';
-    const today = new Date().toISOString().slice(0,10);
-    const todaysGoals = goals.filter(g => g.date === today);
-    if (todaysGoals.length === 0) { goalList.innerHTML = '<div class="empty-state">No goals set for today.</div>'; return; }
-    todaysGoals.forEach((g, idx) => {
-        const li = document.createElement('li'); li.className = 'goal-item';
-        li.innerHTML = `<div>${g.title}</div><div><button class="secondary-btn" data-idx="${idx}">${g.completed? 'Undo' : 'Done'}</button></div>`;
-        goalList.appendChild(li);
-    });
-};
-
-goalForm && goalForm.addEventListener('submit', (e) => {
-    e.preventDefault();
-    const title = goalInput.value.trim(); if (!title) return;
-    const today = new Date().toISOString().slice(0,10);
-    goals.push({ title, completed: false, date: today });
-    saveGoals(); renderGoals(); goalInput.value = '';
-});
-
-goalList && goalList.addEventListener('click', (e) => {
-    const btn = e.target.closest('button'); if (!btn) return;
-    const idx = Number(btn.dataset.idx);
-    // find today's goals indices
-    const today = new Date().toISOString().slice(0,10);
-    const todays = goals.filter(g => g.date === today);
-    const goal = todays[idx];
-    if (!goal) return;
-    goal.completed = !goal.completed;
-    saveGoals(); renderGoals(); updateAnalytics(); renderAchievements();
-});
-
-// Update everything when tasks change
-const refreshAll = () => { updateStats(); updateAnalytics(); renderAchievements(); renderCalendar(); renderGoals(); saveGoals(); };
-
-// renderTasks will call saveTasks(), which triggers refreshAll(); no override needed
-
-// Initial renders
-updateAnalytics(); renderAchievements(); renderCalendar(); renderGoals();
+try{ updateAnalytics(); }catch(e){}
+try{ renderAchievements(); }catch(e){}
+try{ renderGoals(); }catch(e){}
