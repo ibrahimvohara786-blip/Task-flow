@@ -1,0 +1,136 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+<title>TaskFlow Dashboard</title>
+
+<link rel="stylesheet" href="css/dashbord.css">
+
+<link rel="stylesheet"
+href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css">
+
+</head>
+<body>
+
+<div class="sidebar">
+
+<h2>TaskFlow</h2>
+
+<ul>
+<li><i class="fa-solid fa-house"></i> Dashboard</li>
+<li><i class="fa-solid fa-list-check"></i> Tasks</li>
+<li><i class="fa-solid fa-chart-column"></i> Statistics</li>
+<li><i class="fa-solid fa-gear"></i> Settings</li>
+</ul>
+
+</div>
+
+<div class="main">
+
+<div class="topbar">
+
+<div>
+<h1 id="welcomeUser">Welcome</h1>
+<p>Manage your tasks efficiently</p>
+</div>
+
+<div class="top-actions">
+
+<button id="themeBtn">
+🌙
+</button>
+
+<button id="logoutBtn">
+Logout
+</button>
+
+</div>
+
+</div>
+
+<div class="cards">
+
+<div class="card">
+<h3>Total Tasks</h3>
+<p id="totalTasks">0</p>
+</div>
+
+<div class="card">
+<h3>Completed</h3>
+<p id="completedTasks">0</p>
+</div>
+
+<div class="card">
+<h3>Pending</h3>
+<p id="pendingTasks">0</p>
+</div>
+
+<div class="card">
+<h3>Progress</h3>
+<p id="progressPercent">0%</p>
+</div>
+
+</div>
+
+<div class="progress-container">
+
+<div id="progressBar"></div>
+
+</div>
+
+<div class="task-form">
+
+<input
+type="text"
+id="taskInput"
+placeholder="Task Title">
+
+<select id="priority">
+
+<option>Low</option>
+<option>Medium</option>
+<option>High</option>
+
+</select>
+
+<input
+type="date"
+id="dueDate">
+
+<button id="addTaskBtn">
+Add Task
+</button>
+
+</div>
+
+<div class="filters">
+
+<button class="filter-btn" data-filter="all">
+All
+</button>
+
+<button class="filter-btn" data-filter="completed">
+Completed
+</button>
+
+<button class="filter-btn" data-filter="pending">
+Pending
+</button>
+
+</div>
+
+<input
+type="text"
+id="searchInput"
+placeholder="Search task...">
+
+<ul id="taskList"></ul>
+
+</div>
+
+<script src="js/dasbord.js"></script>
+
+</body>
+</html>

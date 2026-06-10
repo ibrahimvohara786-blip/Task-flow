@@ -1,0 +1,158 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+<title>TaskFlow</title>
+
+<link rel="stylesheet" href="css/styles.css">
+
+<link rel="stylesheet"
+href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css">
+
+</head>
+<body>
+
+<div class="theme-toggle">
+    <button id="themeBtn">
+        <i class="fa-solid fa-moon"></i>
+    </button>
+</div>
+
+<div class="container">
+
+    <div class="left-section">
+
+        <h1 class="logo">
+            TaskFlow
+        </h1>
+
+        <h2>
+            Manage Tasks<br>
+            Like a Pro
+        </h2>
+
+        <p>
+            Organize your work,
+            increase productivity,
+            and track progress.
+        </p>
+
+    </div>
+
+    <div class="auth-card">
+
+        <div class="tabs">
+
+            <button
+            class="tab active"
+            id="loginTab">
+                Login
+            </button>
+
+            <button
+            class="tab"
+            id="signupTab">
+                Sign Up
+            </button>
+
+        </div>
+
+        <!-- LOGIN -->
+
+        <form id="loginForm">
+
+            <h3>Welcome Back</h3>
+
+            <div class="input-group">
+
+                <label>Email</label>
+
+                <input
+                type="email"
+                id="loginEmail"
+                required>
+
+            </div>
+
+            <div class="input-group">
+
+                <label>Password</label>
+
+                <input
+                type="password"
+                id="loginPassword"
+                required>
+
+            </div>
+
+            <button
+            type="submit"
+            class="btn">
+
+                Login
+
+            </button>
+
+        </form>
+
+        <!-- SIGNUP -->
+
+        <form
+        id="signupForm"
+        class="hidden">
+
+            <h3>Create Account</h3>
+
+            <div class="input-group">
+
+                <label>Name</label>
+
+                <input
+                type="text"
+                id="signupName"
+                required>
+
+            </div>
+
+            <div class="input-group">
+
+                <label>Email</label>
+
+                <input
+                type="email"
+                id="signupEmail"
+                required>
+
+            </div>
+
+            <div class="input-group">
+
+                <label>Password</label>
+
+                <input
+                type="password"
+                id="signupPassword"
+                required>
+
+            </div>
+
+            <button
+            type="submit"
+            class="btn">
+
+                Create Account
+
+            </button>
+
+        </form>
+
+    </div>
+
+</div>
+
+<script src="js/main.js"></script>
+
+</body>
+</html>
