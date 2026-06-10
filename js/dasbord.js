@@ -195,12 +195,20 @@ const renderAnalyticsChart = () => {
     const counts = days.map(day => tasks.filter(t=>t.completedAt && t.completedAt.slice(0,10)===day).length);
     analyticsChartEl.innerHTML = '';
     const max = Math.max(...counts, 1);
+    // create bars with animated fill
     days.forEach((d,i)=>{
         const bar = document.createElement('div'); bar.className = 'bar';
+        const fill = document.createElement('div'); fill.className = 'fill';
         const h = Math.round((counts[i]/max)*100);
-        bar.style.height = `${Math.max(6,h)}%`;
-        bar.innerHTML = `<small>${counts[i]}</small><div style="font-size:.7rem;color:var(--muted);margin-top:6px">${d.slice(5)}</div>`;
+        fill.style.height = '6%';
+        const label = document.createElement('small'); label.textContent = counts[i];
+        const date = document.createElement('div'); date.style.fontSize = '.7rem'; date.style.color = 'var(--muted)'; date.style.marginTop = '6px'; date.textContent = d.slice(5);
+        bar.appendChild(label);
+        bar.appendChild(fill);
+        bar.appendChild(date);
         analyticsChartEl.appendChild(bar);
+        // animate to target height
+        requestAnimationFrame(()=>{ setTimeout(()=>{ fill.style.height = `${Math.max(6,h)}%`; }, i*60); });
     });
 };
 
