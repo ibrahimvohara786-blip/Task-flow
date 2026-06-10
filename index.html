@@ -1,158 +1,67 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-
-<title>TaskFlow</title>
-
-<link rel="stylesheet" href="css/styles.css">
-
-<link rel="stylesheet"
-href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css">
-
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>TaskFlow</title>
+  <link rel="stylesheet" href="css/styles.css">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css">
 </head>
 <body>
+  <button class="theme-toggle" id="themeBtn" aria-label="Toggle dark mode">
+    <i class="fa-solid fa-moon"></i>
+  </button>
 
-<div class="theme-toggle">
-    <button id="themeBtn">
-        <i class="fa-solid fa-moon"></i>
-    </button>
-</div>
+  <main class="hero">
+    <section class="hero-copy">
+      <span class="eyebrow">TaskFlow</span>
+      <h1>Organize your day with clarity.</h1>
+      <p>Smart task management with a clean interface, quick login, and instant progress tracking.</p>
+      <div class="hero-features">
+        <div><i class="fa-solid fa-check"></i> Simple task flow</div>
+        <div><i class="fa-solid fa-chart-line"></i> Visual progress</div>
+        <div><i class="fa-solid fa-shield-halved"></i> Advanced security</div>
+      </div>
+    </section>
 
-<div class="container">
+    <section class="auth-card">
+      <div class="tabs">
+        <button class="tab active" id="loginTab">Login</button>
+        <button class="tab" id="signupTab">Sign Up</button>
+      </div>
 
-    <div class="left-section">
-
-        <h1 class="logo">
-            TaskFlow
-        </h1>
-
-        <h2>
-            Manage Tasks<br>
-            Like a Pro
-        </h2>
-
-        <p>
-            Organize your work,
-            increase productivity,
-            and track progress.
-        </p>
-
-    </div>
-
-    <div class="auth-card">
-
-        <div class="tabs">
-
-            <button
-            class="tab active"
-            id="loginTab">
-                Login
-            </button>
-
-            <button
-            class="tab"
-            id="signupTab">
-                Sign Up
-            </button>
-
+      <form id="loginForm" class="form-panel">
+        <h2>Welcome Back</h2>
+        <div class="input-group">
+          <label for="loginEmail">Email</label>
+          <input type="email" id="loginEmail" placeholder="you@example.com" required>
         </div>
+        <div class="input-group">
+          <label for="loginPassword">Password</label>
+          <input type="password" id="loginPassword" placeholder="Enter your password" required>
+        </div>
+        <button type="submit" class="btn">Login</button>
+      </form>
 
-        <!-- LOGIN -->
+      <form id="signupForm" class="form-panel hidden">
+        <h2>Create your account</h2>
+        <div class="input-group">
+          <label for="signupName">Name</label>
+          <input type="text" id="signupName" placeholder="Your name" required>
+        </div>
+        <div class="input-group">
+          <label for="signupEmail">Email</label>
+          <input type="email" id="signupEmail" placeholder="you@example.com" required>
+        </div>
+        <div class="input-group">
+          <label for="signupPassword">Password</label>
+          <input type="password" id="signupPassword" placeholder="Minimum 6 characters" required>
+        </div>
+        <button type="submit" class="btn">Sign Up</button>
+      </form>
+    </section>
+  </main>
 
-        <form id="loginForm">
-
-            <h3>Welcome Back</h3>
-
-            <div class="input-group">
-
-                <label>Email</label>
-
-                <input
-                type="email"
-                id="loginEmail"
-                required>
-
-            </div>
-
-            <div class="input-group">
-
-                <label>Password</label>
-
-                <input
-                type="password"
-                id="loginPassword"
-                required>
-
-            </div>
-
-            <button
-            type="submit"
-            class="btn">
-
-                Login
-
-            </button>
-
-        </form>
-
-        <!-- SIGNUP -->
-
-        <form
-        id="signupForm"
-        class="hidden">
-
-            <h3>Create Account</h3>
-
-            <div class="input-group">
-
-                <label>Name</label>
-
-                <input
-                type="text"
-                id="signupName"
-                required>
-
-            </div>
-
-            <div class="input-group">
-
-                <label>Email</label>
-
-                <input
-                type="email"
-                id="signupEmail"
-                required>
-
-            </div>
-
-            <div class="input-group">
-
-                <label>Password</label>
-
-                <input
-                type="password"
-                id="signupPassword"
-                required>
-
-            </div>
-
-            <button
-            type="submit"
-            class="btn">
-
-                Create Account
-
-            </button>
-
-        </form>
-
-    </div>
-
-</div>
-
-<script src="js/main.js"></script>
-
+  <script src="js/main.js"></script>
 </body>
 </html>

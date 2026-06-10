@@ -1,136 +1,174 @@
-<!DOCTYPE html>
+﻿<!DOCTYPE html>
 <html lang="en">
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-
 <title>TaskFlow Dashboard</title>
-
 <link rel="stylesheet" href="css/dashbord.css">
-
-<link rel="stylesheet"
-href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css">
-
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css">
 </head>
 <body>
+  <div class="sidebar">
+    <div class="brand">
+      <h2>TaskFlow</h2>
+      <p>Smart work, clear progress</p>
+    </div>
+    <nav class="menu">
+    <button class="nav-link active" data-section="tasks"><i class="fa-solid fa-list-check"></i> Tasks</button>
+    <button class="nav-link" data-section="statistics"><i class="fa-solid fa-chart-column"></i> Statistics</button>
+    <button class="nav-link" data-section="analytics"><i class="fa-solid fa-chart-pie"></i> Analytics</button>
+    <button class="nav-link" data-section="calendar"><i class="fa-solid fa-calendar-days"></i> Calendar</button>
+    <button class="nav-link" data-section="achievements"><i class="fa-solid fa-trophy"></i> Achievements</button>
+    <button class="nav-link" data-section="goals"><i class="fa-solid fa-bullseye"></i> Goals</button>
+    <button class="nav-link" data-section="settings"><i class="fa-solid fa-gear"></i> Settings</button>
+    </nav>
+  </div>
+  <div class="main">
+    <header class="topbar">
+      <div class="topbar-copy">
+        <p class="eyebrow">Dashboard</p>
+        <h1 id="welcomeUser">Welcome back,</h1>
+        <p class="subtext">Manage tasks, review statistics, and customize your workspace.</p>
+      </div>
+      <div class="top-actions">
+        <button id="themeBtn" class="icon-btn" aria-label="Toggle theme"><i class="fa-solid fa-moon"></i></button>
+        <button id="logoutBtn" class="secondary-btn">Logout</button>
+      </div>
+    </header>
+    <section class="section" id="tasksSection">
+      <div class="section-header">
+        <div>
+          <h2>Tasks</h2>
+          <p>Keep your task list organized and up to date.</p>
+        </div>
+        <div class="summary-badge">Active tool</div>
+      </div>
+      <div class="cards">
+        <article class="card"><span>Total tasks</span><h3 id="totalTasks">0</h3></article>
+        <article class="card"><span>Completed</span><h3 id="completedTasks">0</h3></article>
+        <article class="card"><span>Pending</span><h3 id="pendingTasks">0</h3></article>
+        <article class="card"><span>Progress</span><h3 id="progressPercent">0%</h3></article>
+      </div>
+      <div class="progress-box"><div class="progress-track"></div><div class="progress-fill" id="progressBar"></div></div>
+      <form id="taskForm" class="task-form">
+        <input type="text" id="taskInput" placeholder="Add a new task" required>
+        <textarea id="taskDesc" placeholder="Brief description (optional)"></textarea>
+        <select id="priority">
+          <option value="Low">Low priority</option>
+          <option value="Medium">Medium priority</option>
+          <option value="High">High priority</option>
+        </select>
+        <input type="date" id="dueDate" aria-label="Due date">
+        <button type="submit" class="primary-btn">Add Task</button>
+      </form>
+      <div class="toolbar">
+        <div class="filters">
+          <button class="filter-btn active" data-filter="all">All</button>
+          <button class="filter-btn" data-filter="completed">Completed</button>
+          <button class="filter-btn" data-filter="pending">Pending</button>
+          <button class="filter-btn" data-filter="due-today">Due Today</button>
+          <button class="filter-btn" data-filter="overdue">Overdue</button>
+        </div>
+        <input type="search" id="searchInput" placeholder="Search tasks">
+      </div>
+      <ul id="taskList" class="task-list"></ul>
+      <div id="emptyState" class="empty-state hidden">
+        <h3>No tasks yet</h3>
+        <p>Create your first task to start tracking progress.</p>
+      </div>
+    </section>
+    <section class="section hidden" id="statisticsSection">
+      <div class="section-header">
+        <div>
+          <h2>Statistics</h2>
+          <p>Review your task performance and progress.</p>
+        </div>
+      </div>
+      <div class="cards cards-grid">
+        <article class="stat-card"><span>Task completion</span><h3 id="statCompletion">0%</h3><p>Percentage of tasks completed.</p></article>
+        <article class="stat-card"><span>Active tasks</span><h3 id="statActive">0</h3><p>Tasks you still need to finish.</p></article>
+        <article class="stat-card"><span>High priority</span><h3 id="statHigh">0</h3><p>Tasks marked as high priority.</p></article>
+        <article class="stat-card"><span>Due today</span><h3 id="statDueToday">0</h3><p>Tasks scheduled for today.</p></article>
+        <article class="stat-card"><span>Overdue</span><h3 id="statOverdue">0</h3><p>Tasks past their deadline.</p></article>
+      </div>
+      <div class="details-grid">
+        <div class="detail-card"><h3>Overview</h3><p>Keep momentum by balancing high and low priority work.</p></div>
+        <div class="detail-card"><h3>Time management</h3><p>Use due dates and filters to stay ahead of deadlines.</p></div>
+      </div>
+    </section>
+    <section class="section hidden" id="analyticsSection">
+      <div class="section-header">
+        <div>
+          <h2>Analytics</h2>
+          <p>Visual breakdown of productivity and task trends.</p>
+        </div>
+      </div>
+      <div class="cards cards-grid">
+        <article class="stat-card"><span>Productivity Score</span><h3 id="productivityScore">0</h3><p>Your overall productivity rating.</p></article>
+        <article class="stat-card"><span>Weekly Completed</span><h3 id="weeklyCompleted">0</h3><p>Tasks completed this week.</p></article>
+        <article class="stat-card"><span>Current Streak</span><h3 id="currentStreak">0 days</h3><p>Consecutive days meeting goals.</p></article>
+      </div>
+      <div class="detail-card" id="analyticsChart"><h3>Trends</h3><p>Activity by day (placeholder).</p></div>
+    </section>
 
-<div class="sidebar">
+    <section class="section hidden" id="calendarSection">
+      <div class="section-header">
+        <div>
+          <h2>Calendar</h2>
+          <p>See tasks by date and navigate the month.</p>
+        </div>
+        <div>
+          <button id="prevMonth" class="secondary-btn">Prev</button>
+          <button id="nextMonth" class="secondary-btn">Next</button>
+        </div>
+      </div>
+      <div class="calendar-header">
+        <div id="monthYear" class="month-year"></div>
+        <div id="calendarWeekdays" class="calendar-weekdays"></div>
+      </div>
+      <div id="calendar" class="calendar"></div>
+      <div id="calendarTasks" class="cards"></div>
+    </section>
 
-<h2>TaskFlow</h2>
+    <section class="section hidden" id="achievementsSection">
+      <div class="section-header">
+        <div>
+          <h2>Achievements</h2>
+          <p>Earn badges for milestones and streaks.</p>
+        </div>
+      </div>
+      <div id="achievementsList" class="cards"></div>
+    </section>
 
-<ul>
-<li><i class="fa-solid fa-house"></i> Dashboard</li>
-<li><i class="fa-solid fa-list-check"></i> Tasks</li>
-<li><i class="fa-solid fa-chart-column"></i> Statistics</li>
-<li><i class="fa-solid fa-gear"></i> Settings</li>
-</ul>
-
-</div>
-
-<div class="main">
-
-<div class="topbar">
-
-<div>
-<h1 id="welcomeUser">Welcome</h1>
-<p>Manage your tasks efficiently</p>
-</div>
-
-<div class="top-actions">
-
-<button id="themeBtn">
-🌙
-</button>
-
-<button id="logoutBtn">
-Logout
-</button>
-
-</div>
-
-</div>
-
-<div class="cards">
-
-<div class="card">
-<h3>Total Tasks</h3>
-<p id="totalTasks">0</p>
-</div>
-
-<div class="card">
-<h3>Completed</h3>
-<p id="completedTasks">0</p>
-</div>
-
-<div class="card">
-<h3>Pending</h3>
-<p id="pendingTasks">0</p>
-</div>
-
-<div class="card">
-<h3>Progress</h3>
-<p id="progressPercent">0%</p>
-</div>
-
-</div>
-
-<div class="progress-container">
-
-<div id="progressBar"></div>
-
-</div>
-
-<div class="task-form">
-
-<input
-type="text"
-id="taskInput"
-placeholder="Task Title">
-
-<select id="priority">
-
-<option>Low</option>
-<option>Medium</option>
-<option>High</option>
-
-</select>
-
-<input
-type="date"
-id="dueDate">
-
-<button id="addTaskBtn">
-Add Task
-</button>
-
-</div>
-
-<div class="filters">
-
-<button class="filter-btn" data-filter="all">
-All
-</button>
-
-<button class="filter-btn" data-filter="completed">
-Completed
-</button>
-
-<button class="filter-btn" data-filter="pending">
-Pending
-</button>
-
-</div>
-
-<input
-type="text"
-id="searchInput"
-placeholder="Search task...">
-
-<ul id="taskList"></ul>
-
-</div>
-
-<script src="js/dasbord.js"></script>
-
+    <section class="section hidden" id="goalsSection">
+      <div class="section-header">
+        <div>
+          <h2>Daily Goals</h2>
+          <p>Create and track small daily objectives.</p>
+        </div>
+        <div class="summary-badge">Focus</div>
+      </div>
+      <form id="goalForm" class="task-form">
+        <input type="text" id="goalInput" placeholder="Add a daily goal" required>
+        <button type="submit" class="primary-btn">Add Goal</button>
+      </form>
+      <ul id="goalList" class="task-list"></ul>
+    </section>
+    <section class="section hidden" id="settingsSection">
+      <div class="section-header">
+        <div>
+          <h2>Settings</h2>
+          <p>Personalize how TaskFlow works for you.</p>
+        </div>
+      </div>
+      <div class="settings-grid">
+        <article class="settings-card"><h3>Account</h3><p id="accountInfo">User info is loading...</p></article>
+        <article class="settings-card"><h3>Theme</h3><p>Switch between light and dark mode.</p><button id="themeToggleBtn" class="secondary-btn">Toggle theme</button></article>
+        <article class="settings-card"><h3>Data</h3><p>Remove all stored tasks and start fresh.</p><div class="settings-actions"><button id="clearTasksBtn" class="danger-btn">Clear all tasks</button><button id="clearCompletedBtn" class="secondary-btn">Clear completed</button><button id="exportTasksBtn" class="secondary-btn">Export tasks</button></div></article>
+      </div>
+    </section>
+  </div>
+  <div id="toast" class="toast"></div>
+  <script src="js/dasbord.js"></script>
 </body>
 </html>

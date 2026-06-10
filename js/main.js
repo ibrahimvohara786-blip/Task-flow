@@ -1,132 +1,111 @@
-// Theme
+const loginTab = document.getElementById('loginTab');
+const signupTab = document.getElementById('signupTab');
+const loginForm = document.getElementById('loginForm');
+const signupForm = document.getElementById('signupForm');
+const themeBtn = document.getElementById('themeBtn');
 
-const themeBtn =
-document.getElementById("themeBtn");
-
-if(localStorage.getItem("theme")==="dark"){
-document.body.classList.add("dark");
+const savedTheme = localStorage.getItem('taskflow-theme');
+if (savedTheme === 'dark') {
+  document.body.classList.add('dark');
+  themeBtn.innerHTML = '<i class="fa-solid fa-sun"></i>';
 }
 
-themeBtn.addEventListener("click",()=>{
-
-document.body.classList.toggle("dark");
-
-if(document.body.classList.contains("dark")){
-localStorage.setItem("theme","dark");
-}else{
-localStorage.setItem("theme","light");
-}
-
-});
-
-// Tabs
-
-const loginTab =
-document.getElementById("loginTab");
-
-const signupTab =
-document.getElementById("signupTab");
-
-const loginForm =
-document.getElementById("loginForm");
-
-const signupForm =
-document.getElementById("signupForm");
-
-loginTab.addEventListener("click",()=>{
-
-loginTab.classList.add("active");
-signupTab.classList.remove("active");
-
-loginForm.classList.remove("hidden");
-signupForm.classList.add("hidden");
-
-});
-
-signupTab.addEventListener("click",()=>{
-
-signupTab.classList.add("active");
-loginTab.classList.remove("active");
-
-signupForm.classList.remove("hidden");
-loginForm.classList.add("hidden");
-
-});
-
-// Signup
-
-signupForm.addEventListener("submit",(e)=>{
-
-e.preventDefault();
-
-const user={
-
-name:
-document.getElementById("signupName").value,
-
-email:
-document.getElementById("signupEmail").value,
-
-password:
-document.getElementById("signupPassword").value
-
+const setTheme = (theme) => {
+  if (theme === 'dark') {
+    document.body.classList.add('dark');
+    themeBtn.innerHTML = '<i class="fa-solid fa-sun"></i>';
+    localStorage.setItem('taskflow-theme', 'dark');
+  } else {
+    document.body.classList.remove('dark');
+    themeBtn.innerHTML = '<i class="fa-solid fa-moon"></i>';
+    localStorage.setItem('taskflow-theme', 'light');
+  }
 };
 
-localStorage.setItem(
-"user",
-JSON.stringify(user)
-);
+const switchTab = (tab) => {
+  if (tab === 'login') {
+    loginTab.classList.add('active');
+    signupTab.classList.remove('active');
+    loginForm.classList.remove('hidden');
+    signupForm.classList.add('hidden');
+  } else {
+    signupTab.classList.add('active');
+    loginTab.classList.remove('active');
+    signupForm.classList.remove('hidden');
+    loginForm.classList.add('hidden');
+  }
+};
 
-alert("Account Created Successfully");
+loginTab.addEventListener('click', () => switchTab('login'));
+signupTab.addEventListener('click', () => switchTab('signup'));
 
-signupForm.reset();
-
-loginTab.click();
-
+themeBtn.addEventListener('click', () => {
+  const isDark = document.body.classList.toggle('dark');
+  setTheme(isDark ? 'dark' : 'light');
 });
 
-// Login
+const getUsers = () => {
+  try {
+    return JSON.parse(localStorage.getItem('taskflow-users') || '[]');
+  } catch (error) {
+    return [];
+  }
+};
 
-loginForm.addEventListener("submit",(e)=>{
+const saveUsers = (users) => {
+  localStorage.setItem('taskflow-users', JSON.stringify(users));
+};
 
-e.preventDefault();
+const showAlert = (message) => {
+  alert(message);
+};
 
-const savedUser=
-JSON.parse(
-localStorage.getItem("user")
-);
+signupForm.addEventListener('submit', (event) => {
+  event.preventDefault();
+  const name = document.getElementById('signupName').value.trim();
+  const email = document.getElementById('signupEmail').value.trim().toLowerCase();
+  const password = document.getElementById('signupPassword').value;
 
-if(!savedUser){
+  if (!name || !email || !password) {
+    showAlert('Please fill in every field.');
+    return;
+  }
 
-alert("Please create account first");
-return;
+  const users = getUsers();
+  const existingUser = users.find((user) => user.email === email);
 
-}
+  if (existingUser) {
+    showAlert('This email is already registered. Please login.');
+    switchTab('login');
+    return;
+  }
 
-const email=
-document.getElementById("loginEmail").value;
-
-const password=
-document.getElementById("loginPassword").value;
-
-if(
-savedUser.email===email &&
-savedUser.password===password
-){
-
-localStorage.setItem(
-"loggedIn",
-"true"
-);
-
-window.location.href=
-"dashboard.html";
-
-}
-else{
-
-alert("Invalid Credentials");
-
-}
-
+  users.push({ name, email, password });
+  saveUsers(users);
+  localStorage.setItem('taskflow-user', JSON.stringify({ name, email }));
+  window.location.href = 'dashboard.html';
 });
+
+loginForm.addEventListener('submit', (event) => {
+  event.preventDefault();
+  const email = document.getElementById('loginEmail').value.trim().toLowerCase();
+  const password = document.getElementById('loginPassword').value;
+
+  const users = getUsers();
+  const user = users.find((item) => item.email === email && item.password === password);
+
+  if (!user) {
+    showAlert('Invalid email or password.');
+    return;
+  }
+
+  localStorage.setItem('taskflow-user', JSON.stringify({ name: user.name, email: user.email }));
+  window.location.href = 'dashboard.html';
+});
+
+if (window.location.pathname.endsWith('dashboard.html')) {
+  const activeUser = localStorage.getItem('taskflow-user');
+  if (!activeUser) {
+    window.location.href = 'index.html';
+  }
+}
