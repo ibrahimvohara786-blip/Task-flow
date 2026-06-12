@@ -109,3 +109,100 @@ if (window.location.pathname.endsWith('dashboard.html')) {
     window.location.href = 'index.html';
   }
 }
+// ============================
+// FORGOT PASSWORD FEATURE
+// ============================
+
+const forgotBtn = document.getElementById("forgotPasswordBtn");
+const forgotModal = document.getElementById("forgotModal");
+const closeForgot = document.getElementById("closeForgot");
+const resetPasswordBtn = document.getElementById("resetPasswordBtn");
+
+function showToast(message) {
+  const toast = document.getElementById("toast");
+
+  if (!toast) {
+    alert(message);
+    return;
+  }
+
+  toast.innerText = message;
+  toast.style.display = "block";
+
+  setTimeout(() => {
+    toast.style.display = "none";
+  }, 3000);
+}
+
+if (forgotBtn) {
+  forgotBtn.addEventListener("click", () => {
+    forgotModal.style.display = "flex";
+  });
+}
+
+if (closeForgot) {
+  closeForgot.addEventListener("click", () => {
+    forgotModal.style.display = "none";
+  });
+}
+
+window.addEventListener("click", (e) => {
+  if (e.target === forgotModal) {
+    forgotModal.style.display = "none";
+  }
+});
+
+if (resetPasswordBtn) {
+  resetPasswordBtn.addEventListener("click", async () => {
+
+    const email = document.getElementById("resetEmail").value.trim();
+
+    if (!email) {
+      alert("Please enter your email.");
+      return;
+    }
+
+    resetPasswordBtn.innerHTML =
+      '<i class="fa-solid fa-spinner fa-spin"></i> Sending...';
+
+    resetPasswordBtn.disabled = true;
+
+    try {
+      const response = await fetch(
+        "https://api.web3forms.com/submit",
+        {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+            Accept: "application/json"
+          },
+          body: JSON.stringify({
+            access_key: "a1d8293a-605f-454f-9192-9e98805ffb8d",
+            subject: "TaskFlow Password Reset Request",
+            from_name: "TaskFlow",
+            email: email,
+            message: `Password reset requested for: ${email}`
+          })
+        }
+      );
+
+      const result = await response.json();
+
+      if (result.success) {
+        showToast("Reset request sent successfully!");
+        forgotModal.style.display = "none";
+        document.getElementById("resetEmail").value = "";
+      } else {
+        alert("Failed to send request.");
+      }
+
+    } catch (error) {
+      alert("Something went wrong.");
+      console.error(error);
+    }
+
+    resetPasswordBtn.innerHTML = "Send Reset Request";
+    resetPasswordBtn.disabled = false;
+
+  });
+}
