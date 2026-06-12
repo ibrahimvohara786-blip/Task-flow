@@ -1,67 +1,173 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>TaskFlow</title>
-  <link rel="stylesheet" href="css/styles.css">
-  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css">
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>TaskFlow</title>
+
+<link rel="stylesheet" href="css/styles.css">
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css">
 </head>
+
 <body>
-  <button class="theme-toggle" id="themeBtn" aria-label="Toggle dark mode">
-    <i class="fa-solid fa-moon"></i>
-  </button>
 
-  <main class="hero">
-    <section class="hero-copy">
-      <span class="eyebrow">TaskFlow</span>
-      <h1>Organize your day with clarity.</h1>
-      <p>Smart task management with a clean interface, quick login, and instant progress tracking.</p>
-      <div class="hero-features">
-        <div><i class="fa-solid fa-check"></i> Simple task flow</div>
-        <div><i class="fa-solid fa-chart-line"></i> Visual progress</div>
-        <div><i class="fa-solid fa-shield-halved"></i> Advanced security</div>
+<button class="theme-toggle" id="themeBtn">
+  <i class="fa-solid fa-moon"></i>
+</button>
+
+<main class="hero">
+
+  <section class="hero-copy">
+    <span class="eyebrow">TaskFlow</span>
+
+    <h1>Organize your day with clarity.</h1>
+
+    <p>
+      Smart task management with a clean interface,
+      quick login, and instant progress tracking.
+    </p>
+
+    <div class="hero-features">
+      <div><i class="fa-solid fa-check"></i> Simple task flow</div>
+      <div><i class="fa-solid fa-chart-line"></i> Visual progress</div>
+      <div><i class="fa-solid fa-shield-halved"></i> Advanced security</div>
+    </div>
+  </section>
+
+  <section class="auth-card">
+
+    <div class="tabs">
+      <button class="tab active" id="loginTab">Login</button>
+      <button class="tab" id="signupTab">Sign Up</button>
+    </div>
+
+    <!-- LOGIN FORM -->
+
+    <form id="loginForm" class="form-panel">
+
+      <h2>Welcome Back</h2>
+
+      <div class="input-group">
+        <label>Email</label>
+        <input
+          type="email"
+          id="loginEmail"
+          placeholder="you@example.com"
+          required
+        >
       </div>
-    </section>
 
-    <section class="auth-card">
-      <div class="tabs">
-        <button class="tab active" id="loginTab">Login</button>
-        <button class="tab" id="signupTab">Sign Up</button>
+      <div class="input-group">
+        <label>Password</label>
+        <input
+          type="password"
+          id="loginPassword"
+          placeholder="Enter your password"
+          required
+        >
       </div>
 
-      <form id="loginForm" class="form-panel">
-        <h2>Welcome Back</h2>
-        <div class="input-group">
-          <label for="loginEmail">Email</label>
-          <input type="email" id="loginEmail" placeholder="you@example.com" required>
-        </div>
-        <div class="input-group">
-          <label for="loginPassword">Password</label>
-          <input type="password" id="loginPassword" placeholder="Enter your password" required>
-        </div>
-        <button type="submit" class="btn">Login</button>
-      </form>
+      <div class="forgot-row">
+        <button
+          type="button"
+          id="forgotPasswordBtn"
+          class="forgot-link">
+          Forgot Password?
+        </button>
+      </div>
 
-      <form id="signupForm" class="form-panel hidden">
-        <h2>Create your account</h2>
-        <div class="input-group">
-          <label for="signupName">Name</label>
-          <input type="text" id="signupName" placeholder="Your name" required>
-        </div>
-        <div class="input-group">
-          <label for="signupEmail">Email</label>
-          <input type="email" id="signupEmail" placeholder="you@example.com" required>
-        </div>
-        <div class="input-group">
-          <label for="signupPassword">Password</label>
-          <input type="password" id="signupPassword" placeholder="Minimum 6 characters" required>
-        </div>
-        <button type="submit" class="btn">Sign Up</button>
-      </form>
-    </section>
-  </main>
+      <button type="submit" class="btn">
+        Login
+      </button>
 
-  <script src="js/main.js"></script>
+    </form>
+
+    <!-- SIGNUP FORM -->
+
+    <form id="signupForm" class="form-panel hidden">
+
+      <h2>Create your account</h2>
+
+      <div class="input-group">
+        <label>Name</label>
+        <input
+          type="text"
+          id="signupName"
+          placeholder="Your name"
+          required
+        >
+      </div>
+
+      <div class="input-group">
+        <label>Email</label>
+        <input
+          type="email"
+          id="signupEmail"
+          placeholder="you@example.com"
+          required
+        >
+      </div>
+
+      <div class="input-group">
+        <label>Password</label>
+        <input
+          type="password"
+          id="signupPassword"
+          placeholder="Minimum 6 characters"
+          required
+        >
+      </div>
+
+      <button type="submit" class="btn">
+        Sign Up
+      </button>
+
+    </form>
+
+  </section>
+
+</main>
+
+<!-- FORGOT PASSWORD MODAL -->
+
+<div id="forgotModal" class="forgot-modal">
+
+  <div class="forgot-box">
+
+    <button
+      id="closeForgot"
+      class="close-forgot">
+
+      <i class="fa-solid fa-xmark"></i>
+
+    </button>
+
+    <h2>Forgot Password</h2>
+
+    <p>
+      Enter your email address and we'll send a reset request.
+    </p>
+
+    <input
+      type="email"
+      id="resetEmail"
+      placeholder="Enter your email"
+    >
+
+    <button
+      id="resetPasswordBtn"
+      class="btn">
+
+      Send Reset Request
+
+    </button>
+
+  </div>
+
+</div>
+
+<script src="js/main.js"></script>
+
+<div id="toast" class="toast"></div>
 </body>
 </html>
